@@ -1,0 +1,16 @@
+// types/ab-test.ts
+export interface ABTestHypothesis {
+  context: string;
+  problem: string;
+  hypothesis: string;
+  metrics: {
+    primary: string[];
+    secondary: string[];
+  };
+  variations: {
+    control: string;
+    test: string;
+  };
+  duration: string;
+  sampleSize: string;
+}
