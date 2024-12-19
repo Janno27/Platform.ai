@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "node_modules/.bin/next dev",
+    "build": "node_modules/.bin/next build",
+    "start": "node_modules/.bin/next start",
     "lint": "next lint"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.1",
