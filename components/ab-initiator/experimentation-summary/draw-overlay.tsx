@@ -65,6 +65,7 @@ export function DrawOverlay({ variations, isOpen, onClose, viewMode, onSave }: D
   const [showColorPicker, setShowColorPicker] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const isDrawingStarted = useRef(false);
+  const [slideDirection, setSlideDirection] = useState(0);
 
   const availableImages = variations.filter(v => v[viewMode === 'mobile' ? 'mobileImage' : 'desktopImage']);
   const currentImage = availableImages[currentImageIndex];
@@ -76,10 +77,12 @@ export function DrawOverlay({ variations, isOpen, onClose, viewMode, onSave }: D
   const [startPoint, setStartPoint] = useState<Point | null>(null);
 
   const startDrawing = (e: React.MouseEvent) => {
-    if (!selectedTool || isDrawingStarted.current) return;
+    if (!selectedTool || selectedTool === 'select' || isDrawingStarted.current) return;
     
     const container = containerRef.current;
     if (!container) return;
+    
+    e.stopPropagation();
     
     const rect = container.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -95,14 +98,25 @@ export function DrawOverlay({ variations, isOpen, onClose, viewMode, onSave }: D
   };
 
   const draw = (e: React.MouseEvent) => {
-    if (!isDrawing || !selectedTool || !startPoint || !isDrawingStarted.current) return;
+    if (!isDrawing || !selectedTool || selectedTool === 'select' || !startPoint || !isDrawingStarted.current) return;
+    
+    e.stopPropagation();
+    
     const currentPoint = getMousePosition(e);
     const path = createPerfectRectangle(startPoint, currentPoint);
     setCurrentPath(path);
   };
 
-  const endDrawing = () => {
-    if (!isDrawing || !selectedTool || !currentImage || !currentPath || !isDrawingStarted.current) return;
+  const endDrawing = (e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    
+    if (!isDrawing || !selectedTool || selectedTool === 'select' || !currentImage || !currentPath || !isDrawingStarted.current) {
+      isDrawingStarted.current = false;
+      setIsDrawing(false);
+      return;
+    }
     
     isDrawingStarted.current = false;
     setIsDrawing(false);
@@ -197,7 +211,7 @@ export function DrawOverlay({ variations, isOpen, onClose, viewMode, onSave }: D
 
   const slideVariants = {
     enter: (direction: number) => ({
-      x: direction > 0 ? 1000 : -1000,
+      x: direction > 0 ? 500 : -500,
       opacity: 0
     }),
     center: {
@@ -207,7 +221,7 @@ export function DrawOverlay({ variations, isOpen, onClose, viewMode, onSave }: D
     },
     exit: (direction: number) => ({
       zIndex: 0,
-      x: direction < 0 ? 1000 : -1000,
+      x: direction < 0 ? 500 : -500,
       opacity: 0
     })
   };
@@ -324,6 +338,16 @@ export function DrawOverlay({ variations, isOpen, onClose, viewMode, onSave }: D
     return () => document.removeEventListener('contextmenu', handleContextMenu);
   }, [isOpen]);
 
+  const handlePrevImage = () => {
+    setSlideDirection(-1);
+    setCurrentImageIndex(i => i - 1);
+  };
+
+  const handleNextImage = () => {
+    setSlideDirection(1);
+    setCurrentImageIndex(i => i + 1);
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -331,7 +355,7 @@ export function DrawOverlay({ variations, isOpen, onClose, viewMode, onSave }: D
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[100] ml-[280px]"
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[100]"
         >
           {!availableImages.length ? (
             <div className="h-full flex items-center justify-center">
@@ -422,90 +446,100 @@ export function DrawOverlay({ variations, isOpen, onClose, viewMode, onSave }: D
               <div 
                 ref={containerRef}
                 className="flex-1 flex items-center justify-center"
-                onMouseDown={startDrawing}
-                onMouseMove={draw}
-                onMouseUp={endDrawing}
-                onMouseLeave={endDrawing}
+                onMouseDown={selectedTool && selectedTool !== 'select' ? startDrawing : undefined}
+                onMouseMove={selectedTool && selectedTool !== 'select' ? draw : undefined}
+                onMouseUp={selectedTool && selectedTool !== 'select' ? endDrawing : undefined}
+                onMouseLeave={selectedTool && selectedTool !== 'select' ? endDrawing : undefined}
               >
-                <div className="relative flex items-center">
-                  {/* Navigation gauche */}
-                  {currentImageIndex > 0 && (
+                <div className="relative w-full flex items-center justify-center">
+                  {/* Container pour l'image et les flèches avec une largeur fixe plus grande */}
+                  <div 
+                    className="relative flex items-center"
+                    style={{ width: imageDimensions.width + 160 }}
+                  >
+                    {/* Navigation gauche - Toujours visible */}
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-10 w-10 rounded-full bg-background shadow-lg flex-shrink-0"
-                      onClick={() => setCurrentImageIndex(i => i - 1)}
+                      disabled={currentImageIndex === 0}
+                      className={cn(
+                        "absolute left-0 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background shadow-lg flex-shrink-0 z-10",
+                        currentImageIndex === 0 && "opacity-50 cursor-not-allowed"
+                      )}
+                      onClick={handlePrevImage}
                     >
                       <ChevronLeft className="h-5 w-5" />
                     </Button>
-                  )}
 
-                  {/* Image et zone de dessin */}
-                  <div className="relative flex-shrink-0">
-                    <AnimatePresence mode="wait" custom={currentImageIndex}>
-                      {currentImage && (
-                        <motion.div
-                          key={currentImage.id}
-                          custom={currentImageIndex}
-                          variants={slideVariants}
-                          initial="enter"
-                          animate="center"
-                          exit="exit"
-                          transition={{
-                            x: { type: "spring", stiffness: 300, damping: 30 },
-                            opacity: { duration: 0.2 }
-                          }}
-                          className="relative"
-                          style={{
-                            width: imageDimensions.width,
-                            height: imageDimensions.height
-                          }}
-                        >
-                          <img
-                            src={viewMode === 'mobile' ? currentImage.mobileImage : currentImage.desktopImage}
-                            alt={`Variation ${currentImage.id}`}
-                            className="w-full h-full object-contain pointer-events-none"
-                          />
-                          <svg
-                            ref={svgRef}
-                            className={cn(
-                              "absolute inset-0",
-                              getCursorStyle(selectedTool)
-                            )}
-                            width={imageDimensions.width}
-                            height={imageDimensions.height}
-                            viewBox={`0 0 ${imageDimensions.width} ${imageDimensions.height}`}
-                            style={{ pointerEvents: 'none' }}
+                    {/* Container de l'image centré */}
+                    <div className="relative mx-auto" style={{ width: imageDimensions.width }}>
+                      <AnimatePresence mode="wait" custom={slideDirection}>
+                        {currentImage && (
+                          <motion.div
+                            key={currentImage.id}
+                            custom={slideDirection}
+                            variants={slideVariants}
+                            initial="enter"
+                            animate="center"
+                            exit="exit"
+                            transition={{
+                              x: { type: "spring", stiffness: 300, damping: 30 },
+                              opacity: { duration: 0.2 }
+                            }}
+                            className="relative"
+                            style={{
+                              width: imageDimensions.width,
+                              height: imageDimensions.height
+                            }}
                           >
-                            {drawings[currentImage.id]?.[viewMode]?.map((drawing, index) => (
-                              renderShape(drawing, index)
-                            ))}
-                            {isDrawing && currentPath && (
-                              <path
-                                d={currentPath}
-                                stroke={selectedTool === 'border' ? selectedColor : 'none'}
-                                strokeDasharray={selectedTool === 'border' ? '5,5' : 'none'}
-                                fill={selectedTool === 'overlay' ? `${selectedColor}4D` : 'none'}
-                                strokeWidth="2"
-                              />
-                            )}
-                          </svg>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
+                            <img
+                              src={viewMode === 'mobile' ? currentImage.mobileImage : currentImage.desktopImage}
+                              alt={`Variation ${currentImage.id}`}
+                              className="w-full h-full object-contain pointer-events-none select-none"
+                            />
+                            <svg
+                              ref={svgRef}
+                              className={cn(
+                                "absolute inset-0",
+                                getCursorStyle(selectedTool)
+                              )}
+                              width={imageDimensions.width}
+                              height={imageDimensions.height}
+                              viewBox={`0 0 ${imageDimensions.width} ${imageDimensions.height}`}
+                              style={{ pointerEvents: 'none' }}
+                            >
+                              {drawings[currentImage.id]?.[viewMode]?.map((drawing, index) => (
+                                renderShape(drawing, index)
+                              ))}
+                              {isDrawing && currentPath && (
+                                <path
+                                  d={currentPath}
+                                  stroke={selectedTool === 'border' ? selectedColor : 'none'}
+                                  strokeDasharray={selectedTool === 'border' ? '5,5' : 'none'}
+                                  fill={selectedTool === 'overlay' ? `${selectedColor}4D` : 'none'}
+                                  strokeWidth="2"
+                                />
+                              )}
+                            </svg>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
 
-                  {/* Navigation droite */}
-                  {currentImageIndex < availableImages.length - 1 && (
+                    {/* Navigation droite - Toujours visible */}
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-10 w-10 rounded-full bg-background shadow-lg flex-shrink-0"
-                      onClick={() => setCurrentImageIndex(i => i + 1)}
+                      disabled={currentImageIndex >= availableImages.length - 1}
+                      className={cn(
+                        "absolute right-0 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background shadow-lg flex-shrink-0 z-10",
+                        currentImageIndex >= availableImages.length - 1 && "opacity-50 cursor-not-allowed"
+                      )}
+                      onClick={handleNextImage}
                     >
                       <ChevronRight className="h-5 w-5" />
                     </Button>
-                  )}
+                  </div>
                 </div>
               </div>
             </div>

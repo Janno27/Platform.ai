@@ -276,7 +276,7 @@ export function ChatLayout({ prompt, title, subtitle, onExperimentationReady }: 
                       <div className="px-3 py-2 border border-b-0 border-border/40 bg-background/60 backdrop-blur-sm rounded-t-lg">
                         <div className="flex flex-wrap gap-2 items-center">
                           {imagePreviews.map((img) => (
-                            <div key={img.id} className="relative" style={{ width: '30%' }}>
+                            <div key={img.id} className="relative">
                               <Button
                                 variant="ghost"
                                 size="icon"

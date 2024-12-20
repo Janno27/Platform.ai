@@ -224,7 +224,7 @@ export function ExperimentationSummary() {
                   }}
                   className={cn(
                     "rounded-full transition-all focus-visible:ring-0 hover:bg-transparent cursor-pointer",
-                    (viewMode === mode || (mode === 'draw' && isDrawMode)) && "shadow-[0_0_10px] shadow-foreground/30"
+                    (viewMode === mode || (mode === 'draw' && isDrawMode)) && "shadow-[0_0_5px] shadow-foreground/10"
                   )}
                 >
                   {mode === 'desktop' && <Monitor className={cn("h-4 w-4", viewMode === mode ? "text-foreground" : "text-muted-foreground")} />}
@@ -317,12 +317,12 @@ export function ExperimentationSummary() {
                   />
                 ))}
                 
-                {/* Add Country Button - Version précédente */}
+                {/* Add Country Button */}
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={addNewRoadmap}
-                  className="w-full text-xs text-muted-foreground hover:text-foreground flex items-center justify-center gap-2 hover:bg-transparent hover:shadow-[0_0_10px] hover:shadow-foreground/20"
+                  className="w-full text-xs text-muted-foreground hover:text-foreground flex items-center justify-center gap-2 hover:bg-transparent hover:shadow-[0_0_5px] hover:shadow-foreground/10"
                 >
                   <PlusCircle className="h-3 w-3" />
                   Add country
@@ -472,7 +472,7 @@ export function ExperimentationSummary() {
                       description: `New variation ${variations.length} description...`
                     }]);
                   }}
-                  className="w-full text-xs text-muted-foreground hover:text-foreground flex items-center justify-center gap-2 hover:bg-transparent hover:shadow-[0_0_10px] hover:shadow-foreground/20"
+                  className="w-full text-xs text-muted-foreground hover:text-foreground flex items-center justify-center gap-2 hover:bg-transparent hover:shadow-[0_0_5px] hover:shadow-foreground/10"
                 >
                   <PlusCircle className="h-3 w-3" />
                   Add variation

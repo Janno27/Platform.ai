@@ -15,13 +15,13 @@ const KPIS: KPI[] = [
 const getTypeColor = (type: KPI['type']) => {
   switch (type) {
     case 'tech':
-      return 'bg-tech-background text-tech-foreground';
+      return 'text-tech-foreground';
     case 'data':
-      return 'bg-data-background text-data-foreground';
+      return 'text-data-foreground';
     case 'ai':
-      return 'bg-ai-background text-ai-foreground';
+      return 'text-ai-foreground';
     default:
-      return 'bg-primary/10';
+      return 'text-primary';
   }
 };
 
