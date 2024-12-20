@@ -10,6 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { ExperimentationSummary } from "../experimentation-summary/experimentation-summary";
 import { LoadingDots } from "./loading-dots";
+import { ExperimentationSummarySkeleton } from "../experimentation-summary/experimentation-summary-skeleton";
 
 interface Message {
   id: string;
@@ -51,14 +52,20 @@ export function ChatLayout({ prompt, title, subtitle, onExperimentationReady }: 
   const [imagePreviews, setImagePreviews] = useState<ImagePreview[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageCache, setImageCache] = useState<ImageCache>({});
+  const [showSkeleton, setShowSkeleton] = useState(false);
 
   const handleComplete = () => {
-    console.log("Processing complete!"); // Debugging
     setIsProcessingComplete(true);
     onExperimentationReady();
     setTimeout(() => {
       setShowSummary(true);
     }, 500);
+  };
+
+  const handleLoaderPhaseChange = (currentText: string) => {
+    if (currentText === "Creating - Hypothesis") {
+      setShowSkeleton(true);
+    }
   };
 
   useEffect(() => {
@@ -186,7 +193,10 @@ export function ChatLayout({ prompt, title, subtitle, onExperimentationReady }: 
               )}
           </p>
           <div className="relative z-0">
-            <TestLoader onComplete={handleComplete} />
+            <TestLoader 
+              onComplete={handleComplete} 
+              onPhaseChange={handleLoaderPhaseChange}
+            />
           </div>
         </div>
       ) : (
@@ -378,7 +388,18 @@ export function ChatLayout({ prompt, title, subtitle, onExperimentationReady }: 
         </motion.div>
 
         <div className="relative flex-1 h-full">
-          <AnimatePresence>
+          <AnimatePresence mode="wait">
+            {showSkeleton && !showSummary && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4 }}
+                className="absolute inset-0 h-full w-full"
+              >
+                <ExperimentationSummarySkeleton />
+              </motion.div>
+            )}
             {showSummary && (
               <motion.div
                 initial={{ opacity: 0, x: 300 }}

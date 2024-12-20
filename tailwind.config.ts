@@ -2,29 +2,22 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
     darkMode: ["class"],
-    content: [
-        "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-        "./components/**/*.{js,ts,jsx,tsx,mdx}",
-        "./app/**/*.{js,ts,jsx,tsx,mdx}",
-        "*.{js,ts,jsx,tsx,mdx}"
-    ],
+	content: [
+		"./pages/**/*.{js,ts,jsx,tsx}",
+		"./components/**/*.{js,ts,jsx,tsx}",
+		"./app/**/*.{js,ts,jsx,tsx}",
+		"./**/*.{js,ts,jsx,tsx}" // Ajoutez cette ligne pour tout inclure
+	  ],
     theme: {
         extend: {
             colors: {
                 // Define the base background color
-                background: 'hsl(var(--background))',
-                // Extend the background color to include opacity variants
-                'background-with-opacity': {
-                    '10': 'hsl(var(--background) / 0.1)',
-                    '20': 'hsl(var(--background) / 0.2)',
-                    '30': 'hsl(var(--background) / 0.3)',
-                    '40': 'hsl(var(--background) / 0.4)',
+                background: {
+                    DEFAULT: 'hsl(var(--background))',
                     '50': 'hsl(var(--background) / 0.5)',
-                    '60': 'hsl(var(--background) / 0.6)',
-                    '70': 'hsl(var(--background) / 0.7)',
                     '80': 'hsl(var(--background) / 0.8)',
                     '90': 'hsl(var(--background) / 0.9)',
-                    '100': 'hsl(var(--background) / 1)',
+                    '100': 'hsl(var(--background))',
                 },
                 foreground: 'hsl(var(--foreground))',
                 card: {

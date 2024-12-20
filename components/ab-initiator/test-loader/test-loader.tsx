@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface TestLoaderProps {
   onComplete: () => void;
+  onPhaseChange?: (currentText: string) => void;
 }
 
 const STEPS = [
@@ -21,7 +22,7 @@ const STEPS = [
   { phase: 3, text: ">_ Starting experimentation", isConsole: true }
 ];
 
-export function TestLoader({ onComplete }: TestLoaderProps) {
+export function TestLoader({ onComplete, onPhaseChange }: TestLoaderProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
@@ -37,10 +38,13 @@ export function TestLoader({ onComplete }: TestLoaderProps) {
     const timer = setTimeout(() => {
       setCompletedSteps(prev => [...prev, currentStep]);
       setCurrentStep(prev => prev + 1);
-    }, 1000); // 1 seconde par étape
+      if (onPhaseChange && STEPS[currentStep]) {
+        onPhaseChange(STEPS[currentStep].text);
+      }
+    }, 1000);
 
     return () => clearTimeout(timer);
-  }, [currentStep, onComplete]);
+  }, [currentStep, onComplete, onPhaseChange]);
 
   const renderSteps = (phase: number) => {
     return STEPS
