@@ -1,3 +1,5 @@
 {
-  "/playground/analyzer/page": "app/playground/analyzer/page.js"
+  "/page": "app/page.js",
+  "/playground/analyzer/page": "app/playground/analyzer/page.js",
+  "/playground/initiator/page": "app/playground/initiator/page.js"
 }

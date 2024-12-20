@@ -112,7 +112,7 @@ export function Roadmap({ startDate, onStartDateSelect, isEditing, onEditToggle,
             {/* Country Selector aligné avec les points */}
             <div className="flex items-center">
               <Select defaultValue="FR">
-                <SelectTrigger className="w-[50px] h-6 text-xs pl-1.5 pr-0">
+                <SelectTrigger className="w-[70px] h-6 text-xs pl-1.5 pr-0">
                   <SelectValue className="truncate mr-0" />
                 </SelectTrigger>
                 <SelectContent>

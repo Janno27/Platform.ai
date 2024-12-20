@@ -210,19 +210,21 @@ export function TestSummary({ onCollapse, onAnalysisStart, onProcessStepChange, 
       // Réinitialiser l'état d'agrégation
       setIsAggregated(false)
       setAggregatedData(null)
-      const apiUrl = process.env.REACT_APP_API_URL;
 
-      const response = await fetch(`${apiUrl}/analyze`, {  // Utiliser des backticks pour l'interpolation
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData)
-      })
-      
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP: ${response.status}`);
-      }
+            // Récupérer l'URL de l'API depuis les variables d'environnement
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+        const response = await fetch(`${apiUrl}/analyze`, {  // Utiliser des backticks pour l'interpolation
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestData)
+        })
+  
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP: ${response.status}`)
+        }
 
       const data = await response.json()
       clearInterval(progressInterval)
@@ -258,7 +260,7 @@ export function TestSummary({ onCollapse, onAnalysisStart, onProcessStepChange, 
       if (!analysisData?.raw_data?.transaction) {
         throw new Error("Aucune donnée de transaction à agréger")
       }
-
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       const response = await fetch(`${apiUrl}/aggregate-transactions`, {  // Utiliser des backticks ici
         method: 'POST',
         headers: {

@@ -577,7 +577,7 @@ export function RevenueAnalysis({ data, isLoading = false }: RevenueAnalysisProp
           overall: data?.analysisData?.raw_data?.overall,
         },
       };
-      const apiUrl = process.env.REACT_APP_API_URL;
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       const response = await fetch(`${apiUrl}/calculate-revenue`, {  // Utilisation des backticks pour interpoler la variable
         method: "POST",
         headers: { "Content-Type": "application/json" },

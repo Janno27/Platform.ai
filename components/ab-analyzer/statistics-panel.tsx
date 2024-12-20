@@ -88,7 +88,7 @@ export function StatisticsPanel({
         overall: testData?.analysisData?.raw_data?.overall || [],
         transaction: testData?.analysisData?.raw_data?.transaction || []
       }
-      const apiUrl = process.env.REACT_APP_API_URL;
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       const response = await fetch(`${apiUrl}/calculate-overview`, {  // Utilisez les backticks ici
         method: 'POST',
         headers: {

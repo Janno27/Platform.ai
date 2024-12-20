@@ -223,8 +223,8 @@ export function ExperimentationSummary() {
                     }
                   }}
                   className={cn(
-                    "rounded-full transition-all focus-visible:ring-0 hover:bg-transparent cursor-pointer",
-                    (viewMode === mode || (mode === 'draw' && isDrawMode)) && "shadow-[0_0_5px] shadow-foreground/10"
+                    "rounded-full transition-all focus-visible:ring-0 hover:bg-transparent",
+                    (viewMode === mode || (mode === 'draw' && isDrawMode)) && "animate-glow"
                   )}
                 >
                   {mode === 'desktop' && <Monitor className={cn("h-4 w-4", viewMode === mode ? "text-foreground" : "text-muted-foreground")} />}
@@ -322,7 +322,7 @@ export function ExperimentationSummary() {
                   variant="ghost"
                   size="sm"
                   onClick={addNewRoadmap}
-                  className="w-full text-xs text-muted-foreground hover:text-foreground flex items-center justify-center gap-2 hover:bg-transparent hover:shadow-[0_0_5px] hover:shadow-foreground/10"
+                  className="w-full text-xs text-muted-foreground hover:text-foreground flex items-center justify-center gap-2 hover:bg-transparent hover:animate-glow border-none"
                 >
                   <PlusCircle className="h-3 w-3" />
                   Add country
@@ -461,23 +461,22 @@ export function ExperimentationSummary() {
                 ))}
               </div>
 
-              {variations.length < 4 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    const newVarId = `var${variations.length}`;
-                    setVariations(prev => [...prev, {
-                      id: newVarId,
-                      description: `New variation ${variations.length} description...`
-                    }]);
-                  }}
-                  className="w-full text-xs text-muted-foreground hover:text-foreground flex items-center justify-center gap-2 hover:bg-transparent hover:shadow-[0_0_5px] hover:shadow-foreground/10"
-                >
-                  <PlusCircle className="h-3 w-3" />
-                  Add variation
-                </Button>
-              )}
+              {/* Add Variation Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  const newVarId = `var${variations.length}`;
+                  setVariations(prev => [...prev, {
+                    id: newVarId,
+                    description: `New variation ${variations.length} description...`
+                  }]);
+                }}
+                className="w-full text-xs text-muted-foreground hover:text-foreground flex items-center justify-center gap-2 hover:bg-transparent hover:animate-glow border-none"
+              >
+                <PlusCircle className="h-3 w-3" />
+                Add variation
+              </Button>
             </div>
   
             {/* Section Description */}
