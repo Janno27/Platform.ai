@@ -75,20 +75,20 @@ export function RawDataTable({ data }: RawDataTableProps) {
     try {
       setIsAggregating(true)
       console.log('Data being sent:', data?.analysisData?.raw_data?.transaction)
-      
-      const apiUrl = process.env.REACT_APP_API_URL;
-      const response = await fetch('${apiUrl}/aggregate-transactions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data?.analysisData?.raw_data?.transaction || []),
-      })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.detail || 'Failed to aggregate data')
-      }
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const response = await fetch(`${apiUrl}/aggregate-transactions`, {  // Utiliser des backticks ici
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data?.analysisData?.raw_data?.transaction || []),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Failed to aggregate data');
+    }
       
       const result = await response.json()
       console.log('Received result:', result)

@@ -578,12 +578,12 @@ export function RevenueAnalysis({ data, isLoading = false }: RevenueAnalysisProp
         },
       };
       const apiUrl = process.env.REACT_APP_API_URL;
-      const response = await fetch("${apiUrl}/calculate-revenue", {
+      const response = await fetch(`${apiUrl}/calculate-revenue`, {  // Utilisation des backticks pour interpoler la variable
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestData),
       });
-
+      
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || "Failed to fetch revenue data");

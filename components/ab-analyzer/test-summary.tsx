@@ -211,16 +211,17 @@ export function TestSummary({ onCollapse, onAnalysisStart, onProcessStepChange, 
       setIsAggregated(false)
       setAggregatedData(null)
       const apiUrl = process.env.REACT_APP_API_URL;
-      const response = await fetch('${apiUrl}/analyze', {
+
+      const response = await fetch(`${apiUrl}/analyze`, {  // Utiliser des backticks pour l'interpolation
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestData)
       })
-
+      
       if (!response.ok) {
-        throw new Error(`Erreur HTTP: ${response.status}`)
+        throw new Error(`Erreur HTTP: ${response.status}`);
       }
 
       const data = await response.json()
@@ -258,16 +259,16 @@ export function TestSummary({ onCollapse, onAnalysisStart, onProcessStepChange, 
         throw new Error("Aucune donnée de transaction à agréger")
       }
 
-      const response = await fetch('${apiUrl}/aggregate-transactions', {
+      const response = await fetch(`${apiUrl}/aggregate-transactions`, {  // Utiliser des backticks ici
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(analysisData.raw_data.transaction)
       })
-
+      
       if (!response.ok) {
-        throw new Error(`Erreur HTTP: ${response.status}`)
+        throw new Error(`Erreur HTTP: ${response.status}`);
       }
 
       const result = await response.json()

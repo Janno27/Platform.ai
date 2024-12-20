@@ -89,13 +89,13 @@ export function StatisticsPanel({
         transaction: testData?.analysisData?.raw_data?.transaction || []
       }
       const apiUrl = process.env.REACT_APP_API_URL;
-      const response = await fetch('${apiUrl}/calculate-overview', {
+      const response = await fetch(`${apiUrl}/calculate-overview`, {  // Utilisez les backticks ici
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(dataToSend),
-      })
+      });
 
       if (!response.ok) {
         throw new Error('Failed to fetch overview data')
