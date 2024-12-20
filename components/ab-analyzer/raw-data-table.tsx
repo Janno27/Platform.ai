@@ -76,7 +76,7 @@ export function RawDataTable({ data }: RawDataTableProps) {
       setIsAggregating(true)
       console.log('Data being sent:', data?.analysisData?.raw_data?.transaction)
       
-      const response = await fetch('http://localhost:8000/aggregate-transactions', {
+      const response = await fetch('${process.env.REACT_APP_API_URL}/aggregate-transactions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
