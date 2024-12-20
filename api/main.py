@@ -19,6 +19,12 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
+origins = [
+    "http://localhost:3000",  # URL de votre frontend local
+    "https://platform-back.onrender.com",  # URL de votre frontend en production
+]
+
+
 # Configuration CORS
 app.add_middleware(
     CORSMiddleware,
