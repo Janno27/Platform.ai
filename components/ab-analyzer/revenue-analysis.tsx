@@ -577,8 +577,8 @@ export function RevenueAnalysis({ data, isLoading = false }: RevenueAnalysisProp
           overall: data?.analysisData?.raw_data?.overall,
         },
       };
-
-      const response = await fetch("${process.env.REACT_APP_API_URL}/calculate-revenue", {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const response = await fetch("${apiUrl}/calculate-revenue", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestData),

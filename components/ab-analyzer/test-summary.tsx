@@ -210,8 +210,8 @@ export function TestSummary({ onCollapse, onAnalysisStart, onProcessStepChange, 
       // Réinitialiser l'état d'agrégation
       setIsAggregated(false)
       setAggregatedData(null)
-
-      const response = await fetch('${process.env.REACT_APP_API_URL}/analyze', {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const response = await fetch('${apiUrl}/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -258,7 +258,7 @@ export function TestSummary({ onCollapse, onAnalysisStart, onProcessStepChange, 
         throw new Error("Aucune donnée de transaction à agréger")
       }
 
-      const response = await fetch('${process.env.REACT_APP_API_URL}/aggregate-transactions', {
+      const response = await fetch('${apiUrl}/aggregate-transactions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -88,8 +88,8 @@ export function StatisticsPanel({
         overall: testData?.analysisData?.raw_data?.overall || [],
         transaction: testData?.analysisData?.raw_data?.transaction || []
       }
-      
-      const response = await fetch('${process.env.REACT_APP_API_URL}/calculate-overview', {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const response = await fetch('${apiUrl}/calculate-overview', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
