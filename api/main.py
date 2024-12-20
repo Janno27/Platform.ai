@@ -1,5 +1,3 @@
-# main.py
-
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -12,6 +10,7 @@ from api.processors.data_processor import DataProcessor
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 import logging
+import uvicorn
 
 # Configuration du logging
 logging.basicConfig(level=logging.INFO)
@@ -23,7 +22,6 @@ origins = [
     "http://localhost:3000",  # URL de votre frontend local
     "https://platform-back.onrender.com",  # URL de votre frontend en production
 ]
-
 
 # Configuration CORS
 app.add_middleware(
@@ -312,23 +310,12 @@ async def create_analysis(data: Dict[str, Any]):
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Error creating analysis: {str(e)}"
+            detail=f"Erreur lors de la création de l'analyse: {str(e)}"
         )
 
-@app.get("/analysis-table-preview")
-async def get_analysis_table_preview():
-    """Endpoint pour visualiser la dernière table d'analyse créée."""
-    try:
-        processor = DataProcessor()
-        if hasattr(processor, 'last_analysis_table'):
-            return {
-                'columns': processor.last_analysis_table.columns.tolist(),
-                'data': processor.last_analysis_table.to_dict('records'),
-                'summary': processor.last_analysis_table.describe().to_dict()
-            }
-        return {"message": "No analysis table available"}
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Error retrieving analysis table: {str(e)}"
-        )
+
+# Récupérer le port à partir de la variable d'environnement PORT
+port = int(os.getenv("PORT", 8000))  # Si la variable d'environnement PORT n'est pas définie, on utilise le port 8000
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=port)
