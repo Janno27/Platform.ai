@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { format } from "date-fns";
 import { PencilIcon, ImageIcon, Smartphone, Monitor, Palette, Trash2, Link, CalendarIcon, PlusCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Roadmap } from "./roadmap";
 import { ExpectedResults } from "./expected-results";
 import { DrawOverlay } from "./draw-overlay";
+import { ABTestService } from "@/lib/services/ab-test-service";
+import { supabase } from "@/lib/supabase";
+import { useOrganization } from "@/hooks/useOrganization";
+import { useExperimentation } from '@/providers/experimentation-provider'
 
 const TEST_TYPES = [
   { label: "A/B Test", value: "ab_test" },
@@ -53,6 +57,7 @@ interface CountryRoadmap {
 }
 
 export function ExperimentationSummary() {
+  const { setExperimentationSummaryVisible, updateFormData, formData } = useExperimentation()
   const [testName] = useState("Homepage Optimization Test");
   const [selectedType, setSelectedType] = useState<TestType>("ab_test");
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile' | 'draw'>('desktop');
@@ -75,6 +80,32 @@ export function ExperimentationSummary() {
     { id: '1', countryCode: 'FR' }
   ]);
   const [isDrawMode, setIsDrawMode] = useState(false);
+  const { currentOrganization } = useOrganization();
+
+  useEffect(() => {
+    setExperimentationSummaryVisible(true)
+    return () => {
+      setExperimentationSummaryVisible(false)
+    }
+  }, [setExperimentationSummaryVisible])
+
+  useEffect(() => {
+    if (updateFormData) {
+      updateFormData({
+        name: testName,
+        hypothesis: hypothesisValue,
+        context: contextValue,
+        variations: variations,
+        roadmap: roadmaps,
+        expectedResults: [],
+        status: 'draft'
+      })
+    }
+  }, [testName, hypothesisValue, contextValue, variations, roadmaps, updateFormData])
+
+  useEffect(() => {
+    console.log('Current form data in ExperimentationSummary:', formData)
+  }, [formData])
 
   const handleImageUpload = (variationId: string, event: React.ChangeEvent<HTMLInputElement>, imageType: 'desktop' | 'mobile') => {
     if (event.target.files && event.target.files[0]) {
@@ -179,6 +210,56 @@ export function ExperimentationSummary() {
     );
   };
 
+  const handleSave = async () => {
+    try {
+      const { test, version } = await ABTestService.create({
+        organization_id: currentOrganization.id,
+        name: testName,
+        hypothesis: hypothesisValue,
+        context: contextValue,
+      })
+
+      // Sauvegarder les variations
+      for (const [index, variation] of variations.entries()) {
+        await supabase.from('test_variations').insert({
+          version_id: version.id,
+          name: variation.id === 'control' ? 'Control' : `Variation ${index}`,
+          description: variation.description,
+          desktop_image_path: variation.desktopImage,
+          mobile_image_path: variation.mobileImage,
+          is_control: variation.id === 'control',
+          order_index: index
+        })
+      }
+
+      // Sauvegarder la roadmap
+      for (const roadmap of roadmaps) {
+        await supabase.from('test_roadmaps').insert({
+          version_id: version.id,
+          country_code: roadmap.countryCode,
+          start_date: roadmap.startDate,
+          status: 'planned'
+        })
+      }
+    } catch (error) {
+      console.error('Error saving test:', error)
+    }
+  }
+
+  const handleHypothesisChange = (value: string) => {
+    setHypothesisValue(value)
+    updateFormData({ hypothesis: value })
+  }
+
+  const handleContextChange = (value: string) => {
+    setContextValue(value)
+    updateFormData({ context: value })
+  }
+
+  const handleHypothesisEdit = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    handleHypothesisChange(e.target.value)
+  }
+
   return (
     <ScrollArea className="h-full px-8">
       <div className="space-y-8 pb-8">
@@ -255,7 +336,7 @@ export function ExperimentationSummary() {
               {isEditingHypothesis ? (
                 <Textarea
                   value={hypothesisValue}
-                  onChange={(e) => setHypothesisValue(e.target.value)}
+                  onChange={handleHypothesisEdit}
                   placeholder="If we [make this change] for [these users], then [this metric] will [increase/decrease] by [this amount]"
                   className="min-h-[100px] text-xs text-muted-foreground bg-muted/50 resize-none"
                 />

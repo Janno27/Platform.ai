@@ -20,9 +20,12 @@ interface Message {
 }
 
 interface ChatLayoutProps {
-  prompt: string;
+  prompt?: string;
   title?: string;
   subtitle?: string;
+  initialMessage?: string;
+  skipLoader?: boolean;
+  showExperimentationImmediately?: boolean;
   onExperimentationReady: () => void;
 }
 
@@ -36,17 +39,36 @@ interface ImageCache {
   [key: string]: string;
 }
 
-export function ChatLayout({ prompt, title, subtitle, onExperimentationReady }: ChatLayoutProps) {
+export function ChatLayout({ 
+  prompt,
+  title,
+  subtitle,
+  initialMessage,
+  skipLoader = false,
+  showExperimentationImmediately = false,
+  onExperimentationReady 
+}: ChatLayoutProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isProcessingComplete, setIsProcessingComplete] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [messages, setMessages] = useState<Message[]>([
-    { id: '1', content: prompt, type: 'user' },
-    { id: '2', content: "I'll help you create a new experimentation following good methodologies and helping you organize your ideas according to best practices.", type: 'assistant' },
-    { id: '3', content: '', type: 'loader' }
-  ]);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    if (skipLoader) {
+      return [
+        {
+          id: '1',
+          content: initialMessage || "I'm here to help you create a new experimentation.",
+          type: 'assistant'
+        }
+      ];
+    }
+    return [
+      { id: '1', content: prompt!, type: 'user' },
+      { id: '2', content: "I'll help you create a new experimentation following good methodologies and helping you organize your ideas according to best practices.", type: 'assistant' },
+      { id: '3', content: '', type: 'loader' }
+    ];
+  });
   const [input, setInput] = useState("");
-  const [showSummary, setShowSummary] = useState(false);
+  const [showSummary, setShowSummary] = useState(showExperimentationImmediately);
   const [showShortcutHint, setShowShortcutHint] = useState(false);
   const CHAR_THRESHOLD = 10; // Seuil de caractères pour afficher l'aide
   const [imagePreviews, setImagePreviews] = useState<ImagePreview[]>([]);
@@ -236,7 +258,7 @@ export function ChatLayout({ prompt, title, subtitle, onExperimentationReady }: 
         <motion.div
           animate={{ width: isCollapsed ? '60px' : '35%' }}
           transition={{ duration: 0.3 }}
-          className="relative h-full flex flex-col bg-background/80 rounded-xl"
+          className="relative h-full flex flex-col"
         >
           <Button
             variant="ghost"

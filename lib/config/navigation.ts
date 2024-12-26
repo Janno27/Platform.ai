@@ -1,4 +1,4 @@
-import { url } from "inspector"
+import { Permission } from '@/types/role'
 import {
   SquareTerminal,
   BookOpen,
@@ -9,10 +9,18 @@ import {
   PieChart,
   Map,
   LayoutDashboard,
-  KanbanSquare,
-  GitFork,
   Database,
 } from "lucide-react"
+
+// Définir l'interface pour la navigation
+interface NavItem {
+  title: string
+  url: string
+  icon: any
+  requiredPermission?: keyof Permission
+  items?: NavItem[]
+  isActive?: boolean
+}
 
 export const navigationConfig = {
   user: {
@@ -89,16 +97,19 @@ export const navigationConfig = {
       name: "Design Engineering",
       url: "/projects/design",
       icon: Frame,
+      requiredPermission: "test_management"
     },
     {
       name: "Sales & Marketing",
       url: "/projects/sales",
       icon: PieChart,
+      requiredPermission: "test_management"
     },
     {
       name: "Travel",
       url: "/projects/travel",
       icon: Map,
+      requiredPermission: "test_management"
     },
   ],
   navSecondary: [
@@ -106,19 +117,18 @@ export const navigationConfig = {
       title: "Settings",
       url: "/settings",
       icon: Settings2,
+      requiredPermission: "settings_management",
       items: [
         {
-          title: "General",
-          url: "/settings/general",
+          title: "Organization",
+          url: "/settings/organization",
+          requiredPermission: "organization_management"
         },
         {
-          title: "Integrations",
-          url: "/settings/integrations",
-        },
-        {
-          title: "Team",
-          url: "/settings/team",
-        },
+          title: "Users",
+          url: "/settings/users",
+          requiredPermission: "user_management"
+        }
       ],
     },
     {

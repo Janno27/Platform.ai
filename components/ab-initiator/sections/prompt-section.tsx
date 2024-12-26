@@ -8,6 +8,7 @@ import { HuggingFaceService } from '@/lib/services/huggingface-service';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from "framer-motion";
 import { ChatLayout } from "../test-loader/chat-layout";
+import { RecentDrafts } from "./recent-drafts";
 
 const EXAMPLE_PROMPTS = [
   "Context: High bounce rate detected in funnel analysis",
@@ -148,6 +149,8 @@ export function PromptSection() {
               ))}
             </div>
           </div>
+
+          <RecentDrafts />
         </motion.div>
       ) : (
         <ChatLayout

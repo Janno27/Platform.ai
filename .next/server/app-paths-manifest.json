@@ -1,5 +1,6 @@
 {
-  "/page": "app/page.js",
-  "/playground/analyzer/page": "app/playground/analyzer/page.js",
-  "/playground/initiator/page": "app/playground/initiator/page.js"
+  "/_not-found/page": "app/_not-found/page.js",
+  "/auth/callback/route": "app/auth/callback/route.js",
+  "/auth/login/page": "app/auth/login/page.js",
+  "/(protected)/overview/page": "app/(protected)/overview/page.js"
 }
